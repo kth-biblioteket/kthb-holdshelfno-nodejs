@@ -13,68 +13,68 @@ var js2xmlparser = require("js2xmlparser");
 var plain = (function(a,b){while(a--)b[a]=a+32;return b})(95,[]);
 var cipher = config.cipher
 exports.index = async function (req, res) {
-        let crypted_primaryid = encrypt(req.params.primaryid);
-        let sql;
-        let result;
-        let currentnumber;
-        let holdshelfnumber;
+    let crypted_primaryid = encrypt(req.params.primaryid);
+    let sql;
+    let result;
+    let currentnumber;
+    let holdshelfnumber;
 
-        const db = await mysql.createConnection({
-            host: config.dbhost,
-            user: config.dbuser,
-            password: config.dbpassword,
-            database: config.db
-        });
+    const db = await mysql.createConnection({
+        host: config.dbhost,
+        user: config.dbuser,
+        password: config.dbpassword,
+        database: config.db
+    });
 
-        //hämta aktuell användare
-        sql = `SELECT max(number) AS number 
-            FROM holdshelfnumber
-            WHERE userid_encrypted = '${crypted_primaryid}'`;
-        result = await db.query(sql);
+    //hämta aktuell användare
+    sql = `SELECT max(number) AS number 
+        FROM holdshelfnumber
+        WHERE userid_encrypted = '${crypted_primaryid}'`;
+    result = await db.query(sql);
 
-        if(result.length > 0) {
-            for (const row of result) {
-                currentnumber = row.number
-            }
-        } else {
-            currentnumber = 0;
+    if(result.length > 0) {
+        for (const row of result) {
+            currentnumber = row.number
         }
-        //hämta aktuell användare och additional_id
-        sql = `SELECT * 
+    } else {
+        currentnumber = 0;
+    }
+    //hämta aktuell användare och additional_id
+    sql = `SELECT * 
+    FROM holdshelfnumber
+    WHERE userid_encrypted = '${crypted_primaryid}' AND additional_id = '${req.params.additional_id}'`;
+    console.log(sql)
+    result = await db.query(sql);
+
+    //Lägg till ny rad om användaren + additional_id inte finns
+    if(result.length == 0) {
+    sql = `INSERT INTO holdshelfnumber
+                VALUES('${crypted_primaryid}',${currentnumber + 1},'${req.params.additional_id}')`;
+    result = await db.query(sql);
+    }
+
+    //Hämta raden
+    sql = `SELECT * 
         FROM holdshelfnumber
         WHERE userid_encrypted = '${crypted_primaryid}' AND additional_id = '${req.params.additional_id}'`;
-        console.log(sql)
-        result = await db.query(sql);
+    result = await db.query(sql);
+    if(result.length > 0) {
+    for (const row of result) {
+        holdshelfnumber = zeroPad(row.number, 3);
+        userid_encrypted = row.userid_encrypted;
+    }
+    }
 
-        //Lägg till ny rad om användaren + additional_id inte finns
-        if(result.length == 0) {
-        sql = `INSERT INTO holdshelfnumber
-                    VALUES('${crypted_primaryid}',${currentnumber + 1},'${req.params.additional_id}')`;
-        result = await db.query(sql);
-        }
-
-        //Hämta raden
-        sql = `SELECT * 
-            FROM holdshelfnumber
-            WHERE userid_encrypted = '${crypted_primaryid}' AND additional_id = '${req.params.additional_id}'`;
-        result = await db.query(sql);
-        if(result.length > 0) {
-        for (const row of result) {
-            holdshelfnumber = zeroPad(row.number, 3);
-            userid_encrypted = row.userid_encrypted;
-        }
-        }
-
-        var data = {
-        "records": result.length,
-        "holdshelfnumber": holdshelfnumber,
-        "userid_encrypted": userid_encrypted
-        };
-        xmlres = js2xmlparser.parse("holdshelfnumber",data);
-        res.type('application/xml');
-        res.send(xmlres);
-        //res.json(data);
-        db.end();
+    var data = {
+    "records": result.length,
+    "holdshelfnumber": holdshelfnumber,
+    "userid_encrypted": userid_encrypted
+    };
+    xmlres = js2xmlparser.parse("holdshelfnumber",data);
+    res.type('application/xml');
+    res.send(xmlres);
+    //res.json(data);
+    db.end();
 };
 
 //FUNCTIONS

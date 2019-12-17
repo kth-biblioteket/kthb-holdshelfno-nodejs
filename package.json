@@ -18,6 +18,7 @@
     "mysql2": "^2.0.2",
     "promise-mysql": "^4.1.1",
     "simple-crypto-js": "^2.2.0",
+    "sql-injection": "0.0.6",
     "xml": "^1.0.1"
   }
 }
