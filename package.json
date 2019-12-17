@@ -1,0 +1,23 @@
+{
+  "name": "kthb-holdshelfno-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-ipfilter": "^1.1.0",
+    "hashids": "^2.0.1",
+    "js2xmlparser": "^4.0.0",
+    "mysql": "^2.17.1",
+    "mysql2": "^2.0.2",
+    "promise-mysql": "^4.1.1",
+    "simple-crypto-js": "^2.2.0",
+    "xml": "^1.0.1"
+  }
+}
