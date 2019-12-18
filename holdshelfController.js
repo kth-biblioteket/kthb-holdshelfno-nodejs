@@ -10,7 +10,9 @@ const mysql = require("promise-mysql");
 var js2xmlparser = require("js2xmlparser");
 
 //Randomskapat cipher som byter ut bokstav mot annan bokstav men behåller andra tecken som de är
-var plain = (function(a,b){while(a--)b[a]=a+32;return b})(95,[]);
+//var plain = (function(a,b){while(a--)b[a]=a+65;return b})(32,[]);
+//var plain = (function(a,b){while(a--)b[a]=a+97;return b})(26,[]);
+//var cipher = shuffle(plain.slice(0));
 var cipher = config.cipher
 exports.index = async function (req, res) {
     let crypted_primaryid = encrypt(req.params.primaryid);
@@ -26,10 +28,10 @@ exports.index = async function (req, res) {
         database: config.db
     });
 
-    //hämta aktuell användare
+    //hämta aktuell användares högsta löpnummer
     sql = `SELECT max(number) AS number 
-        FROM holdshelfnumber
-        WHERE userid_encrypted = '${crypted_primaryid}'`;
+            FROM holdshelfnumber
+            WHERE userid_encrypted = '${crypted_primaryid}'`;
     result = await db.query(sql);
 
     if(result.length > 0) {
@@ -41,34 +43,33 @@ exports.index = async function (req, res) {
     }
     //hämta aktuell användare och additional_id
     sql = `SELECT * 
-    FROM holdshelfnumber
-    WHERE userid_encrypted = '${crypted_primaryid}' AND additional_id = '${req.params.additional_id}'`;
-    console.log(sql)
+            FROM holdshelfnumber
+            WHERE userid_encrypted = '${crypted_primaryid}' AND additional_id = '${req.params.additional_id}'`;
     result = await db.query(sql);
 
-    //Lägg till ny rad om användaren + additional_id inte finns
+    //Lägg till ny rad med uppräknat löpnummer om användaren + additional_id inte finns
     if(result.length == 0) {
     sql = `INSERT INTO holdshelfnumber
-                VALUES('${crypted_primaryid}',${currentnumber + 1},'${req.params.additional_id}')`;
+            VALUES('${crypted_primaryid}',${currentnumber + 1},'${req.params.additional_id}')`;
     result = await db.query(sql);
     }
 
     //Hämta raden
     sql = `SELECT * 
-        FROM holdshelfnumber
-        WHERE userid_encrypted = '${crypted_primaryid}' AND additional_id = '${req.params.additional_id}'`;
+            FROM holdshelfnumber
+            WHERE userid_encrypted = '${crypted_primaryid}' AND additional_id = '${req.params.additional_id}'`;
     result = await db.query(sql);
     if(result.length > 0) {
-    for (const row of result) {
-        holdshelfnumber = zeroPad(row.number, 3);
-        userid_encrypted = row.userid_encrypted;
-    }
+        for (const row of result) {
+            holdshelfnumber = zeroPad(row.number, 3);
+            userid_encrypted = row.userid_encrypted;
+        }
     }
 
     var data = {
-    "records": result.length,
-    "holdshelfnumber": holdshelfnumber,
-    "userid_encrypted": userid_encrypted
+        "records": result.length,
+        "holdshelfnumber": holdshelfnumber,
+        "userid_encrypted": userid_encrypted
     };
     xmlres = js2xmlparser.parse("holdshelfnumber",data);
     res.type('application/xml');
@@ -77,7 +78,7 @@ exports.index = async function (req, res) {
     db.end();
 };
 
-//FUNCTIONS
+//Funktioner
 function zeroPad(num, places) {
     var zero = places - num.toString().length + 1;
     return Array(+(zero > 0 && zero)).join("0") + num;

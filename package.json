@@ -12,12 +12,9 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-ipfilter": "^1.1.0",
-    "hashids": "^2.0.1",
     "js2xmlparser": "^4.0.0",
     "mysql": "^2.17.1",
-    "mysql2": "^2.0.2",
     "promise-mysql": "^4.1.1",
-    "simple-crypto-js": "^2.2.0",
     "sql-injection": "0.0.6",
     "xml": "^1.0.1"
   }
