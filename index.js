@@ -14,7 +14,6 @@ app.use(bodyParser.json());
 
 app.use(sqlinjection);
 
-//CORS
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
     res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
@@ -30,8 +29,7 @@ app.use(ipfilter(ips, { mode: 'allow' }))
 */
   
 app.use(config.apiroot, apiRoutes);
-  
-//Server
+
 var port = config.port || 3007;
 var server = app.listen(port, function () {
     console.log("App now running on port", port);

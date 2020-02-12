@@ -1,8 +1,5 @@
-// holdshelfController.js
-
 let config = require('./configs/config/config');
 
-// Import holdshelf model
 holdshelf = require('./holdshelfModel');
 
 const mysql = require("promise-mysql");
