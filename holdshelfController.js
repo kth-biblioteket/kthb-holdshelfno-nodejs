@@ -10,6 +10,10 @@ var js2xmlparser = require("js2xmlparser");
 //var plain = (function(a,b){while(a--)b[a]=a+65;return b})(32,[]);
 //var plain = (function(a,b){while(a--)b[a]=a+97;return b})(26,[]);
 //var cipher = shuffle(plain.slice(0));
+
+//TODO
+//Kolla primary ID mot LDAP?
+
 var cipher = config.cipher
 exports.index = async function (req, res) {
     let crypted_primaryid = encrypt(req.params.primaryid);
